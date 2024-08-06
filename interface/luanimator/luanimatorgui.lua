@@ -4,10 +4,17 @@ require "/interface/animatedWidgets.lua"
 function init()
 	local path = status.statusProperty("luAnimatorPath", "/scripts/luanimation.json")
 	self.formList = {}
-	self.animation = root.assetJson(path)
 	status.setStatusProperty("luaInterfaceEnabled", true)
-	widget.setText("lytMain.txtFileName", path:match("(%w+)%.json"))
-  widget.setText("lytMain.textboxAFKTime", status.statusProperty("luaAFKTimer", 5))
+
+	if pcall(function() root.assetJson(path) end) then
+		self.animation = root.assetJson(path)
+
+		widget.setText("lytMain.txtFileName", path:match("(%w+)%.json"))
+		widget.setText("lytMain.textboxAFKTime", status.statusProperty("luaAFKTimer", 5))
+	else
+		widget.setText("lytMain.lblWarning", "^#ff0000;File Not Found")
+		self.animation = {}
+	end
 	
 	widget.setChecked("lytMain.buttonOnLoad", status.statusProperty("luAnimatorStartOnLoad", false))
 	

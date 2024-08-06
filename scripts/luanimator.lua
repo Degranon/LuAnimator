@@ -516,7 +516,13 @@ function init()
 
   status.setStatusProperty("luaInterfaceEnabled", false)
   local path = status.statusProperty("luAnimatorPath", "/scripts/luanimation.json")
-  luAnimation = root.assetJson(path)
+
+  if pcall(function() root.assetJson(path) end) then
+		luAnimation = root.assetJson(path)
+	else
+		sb.logError(sb.print(path) .. " file does not exist")
+	end
+
 
   if not _ENV["starExtensions"] then
     Bind.create("specialThree shift", function()
