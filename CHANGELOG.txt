@@ -1,1 +1,2 @@
-- Fixed the missing file causing the mod to crash
+- Fixed the small AFK timer breaking emotes
+- Now the animations take your controller rotation in consideration. Wee!

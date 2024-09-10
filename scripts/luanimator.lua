@@ -58,9 +58,15 @@ function luAnimator.update(args)
     luAnimator.adjustPosition(args)
     mcontroller.controlParameters(luAnimator.controlParameters.sitting)
   end
+
+  if self.previousRotation ~= mcontroller.rotation() then
+    self.previousRotation = mcontroller.rotation()
+    luAnimator.transformGroup(luAnimation[luAnimator.form][luAnimator.state])
+  end
   
   sb.setLogMap("LuAState", luAnimator.state)
   sb.setLogMap("LuAForm", luAnimator.form)
+  sb.setLogMap("LuAEmote", luAnimator.emote)
   sb.setLogMap("LuATick", luAnimator.animationTick)
   sb.setLogMap("LuAStateChanged", sb.print(luAnimator.stateChanged))
 end
@@ -146,7 +152,7 @@ function luAnimator.getState(args)
     newState = "Alt_Fire"
   end
 
-  if newState ~= "none" and luAnimation[luAnimator.form][newState] and newState ~= previousState then
+  if newState ~= "none" and luAnimation[luAnimator.form][newState] and (newState ~= previousState or luAnimator.emote ~= previousEmote) then
     luAnimator.animationTick = 0
     luAnimator.soundTick = 0
     animator.stopAllSounds("activate")
@@ -165,6 +171,10 @@ end
   @return - is player afk
 ]]
 function luAnimator.afk(args, prevEmote, newEmote)
+  if not luAnimation[luAnimator.form]["AFK"] then
+    return false
+  end
+
   local aimPosition = tech.aimPosition()
   sb.setLogMap("AFK Timer", self.afkTimer)
   if vec2.eq(aimPosition, self.aimPosition) and math.abs(mcontroller.rotation()) < 0.1 and not args.moves.up and not args.moves.down and not args.moves.left and not args.moves.right and not args.moves.primaryFire and not args.moves.altFire 
@@ -316,13 +326,18 @@ function luAnimator.animating()
   animator.setFlipped(mcontroller.facingDirection() == -1 or false)
 end
 
+function luAnimator.transformGroup(state)
+  animator.resetTransformationGroup("ball")
+  animator.translateTransformationGroup("ball", state.properties.translation)
+  animator.rotateTransformationGroup("ball", mcontroller.rotation())
+  animator.scaleTransformationGroup("ball", state.properties.frameScale, state.properties.translation)
+  tech.setParentHidden(state.properties.isInvisible)
+end
+
 function luAnimator.applyChanges(state, emote, layer, framesType)
 	if luAnimator.stateChanged then
 		luAnimator.stateChanged = false
-		animator.resetTransformationGroup("ball")
-		animator.translateTransformationGroup("ball", state.properties.translation)
-		animator.scaleTransformationGroup("ball", state.properties.frameScale, state.properties.translation)
-		tech.setParentHidden(state.properties.isInvisible)
+		luAnimator.transformGroup(state)
 	end
 	animator.setPartTag(layer, "partImage", "/assetmissing.png" .. state.emotes[emote][framesType][tostring(luAnimator.animationTick)] .. ";")
 end
@@ -480,6 +495,9 @@ function init()
   self.afkTime = status.statusProperty("luaAFKTimer", 5)
   self.afkTimer = self.afkTime
   self.aimPosition = tech.aimPosition()
+
+  -- Controller
+  self.previousRotation = mcontroller.rotation()
 
 
   -- Initialize further parameters.
