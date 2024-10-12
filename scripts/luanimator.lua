@@ -327,11 +327,13 @@ function luAnimator.animating()
 end
 
 function luAnimator.transformGroup(state)
-  animator.resetTransformationGroup("ball")
-  animator.translateTransformationGroup("ball", state.properties.translation)
-  animator.rotateTransformationGroup("ball", mcontroller.rotation())
-  animator.scaleTransformationGroup("ball", state.properties.frameScale, state.properties.translation)
-  tech.setParentHidden(state.properties.isInvisible)
+  if state then
+    animator.resetTransformationGroup("ball")
+    animator.translateTransformationGroup("ball", state.properties.translation)
+    animator.rotateTransformationGroup("ball", mcontroller.rotation())
+    animator.scaleTransformationGroup("ball", state.properties.frameScale, state.properties.translation)
+    tech.setParentHidden(state.properties.isInvisible)
+  end
 end
 
 function luAnimator.applyChanges(state, emote, layer, framesType)

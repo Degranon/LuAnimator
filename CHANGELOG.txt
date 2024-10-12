@@ -1,2 +1,1 @@
-- Fixed the small AFK timer breaking emotes
-- Now the animations take your controller rotation in consideration. Wee!
+- Fixed the crash during the rotation
