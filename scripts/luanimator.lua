@@ -63,6 +63,8 @@ function luAnimator.update(args)
     self.previousRotation = mcontroller.rotation()
     luAnimator.transformGroup(luAnimation[luAnimator.form][luAnimator.state])
   end
+
+  
   
   sb.setLogMap("LuAState", luAnimator.state)
   sb.setLogMap("LuAForm", luAnimator.form)
@@ -152,7 +154,13 @@ function luAnimator.getState(args)
     newState = "Alt_Fire"
   end
 
-  if newState ~= "none" and luAnimation[luAnimator.form][newState] and (newState ~= previousState or luAnimator.emote ~= previousEmote) then
+  local validEmote = luAnimation[luAnimator.form][newState] and luAnimation[luAnimator.form][newState].emotes[luAnimator.emote]
+
+  if newState ~= "none" 
+    and (newState ~= previousState or luAnimator.emote ~= previousEmote)
+    and luAnimation[luAnimator.form][newState] then
+
+    
     luAnimator.animationTick = 0
     luAnimator.soundTick = 0
     animator.stopAllSounds("activate")
@@ -176,7 +184,7 @@ function luAnimator.afk(args, prevEmote, newEmote)
   end
 
   local aimPosition = tech.aimPosition()
-  sb.setLogMap("AFK Timer", self.afkTimer)
+
   if vec2.eq(aimPosition, self.aimPosition) and math.abs(mcontroller.rotation()) < 0.1 and not args.moves.up and not args.moves.down and not args.moves.left and not args.moves.right and not args.moves.primaryFire and not args.moves.altFire 
   and (newEmote == "idle" or newEmote == "blink") then
     self.afkTimer = math.max(self.afkTimer - args.dt, 0)
@@ -435,14 +443,16 @@ end
 ]]
 function luAnimator.activateAnimation()
     luAnimator.clearTags()
-    if luAnimation[luAnimator.form].Activate then
-       luAnimator.justActivated = true
+    if luAnimation and luAnimation[luAnimator.form] then
+      if luAnimation[luAnimator.form].Activate then
+        luAnimator.justActivated = true
+      end
+      luAnimator.animationTick = 0
+      luAnimator.soundTick = 0
+      --tech.setParentState("fly")
+      animator.setAnimationState("ballState", "on")
+      --status.setPersistentEffects("movementAbility", {{stat = "activeMovementAbilities", amount = 1}})
     end
-    luAnimator.animationTick = 0
-    luAnimator.soundTick = 0
-    --tech.setParentState("fly")
-    animator.setAnimationState("ballState", "on")
-    --status.setPersistentEffects("movementAbility", {{stat = "activeMovementAbilities", amount = 1}})
 end
 
 

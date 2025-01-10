@@ -1,1 +1,1 @@
-- Fixed the crash during the rotation
+- Fixed the interface breaking up if the preview could not be loaded

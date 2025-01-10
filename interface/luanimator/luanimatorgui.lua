@@ -17,13 +17,15 @@ function init()
 	end
 	
 	widget.setChecked("lytMain.buttonOnLoad", status.statusProperty("luAnimatorStartOnLoad", false))
-	
 
+	retrieveForm()
+end
+
+function retrieveForm()
 	promises:add(world.sendEntityMessage(player.id(), "luanimator.getForm"), function(result) 
 		self.currentForm = result.currentForm
 		populateListWithForms()
 	end)
-
 end
 
 function update(dt)
@@ -40,9 +42,11 @@ function populateListWithForms()
 		-- There are animations without Idle stances, so we are looking for an image dynamically --
 		local image = "/assetmissing.png"
 		for _, stance in pairs(form) do
-			for _, emote in pairs(stance.emotes) do
-				image = image .. emote.frames["1"]
-				break
+			for emoteName, emote in pairs(stance.emotes) do
+				if emote and emote.frames and emote.frames["1"] then
+					image = image .. emote.frames["1"]
+					break
+				end
 			end
 			break
 		end
