@@ -19,7 +19,7 @@ luAnimator = {
 --[[
   StarExtentions binds
 ]]
-function luAnimator.SEbinds()
+function luAnimator.SEOSBbinds()
   if input.bindDown("luanimator", "toggle") then
     luAnimator.attemptToggleAnimation()
   end
@@ -76,8 +76,8 @@ end
 
 -- Bind LuAnimator update function
 function update (args)
-  if _ENV["starExtensions"] then
-    luAnimator.SEbinds()
+  if _ENV["starExtensions"] or _ENV["renderer"] then
+    luAnimator.SEOSBbinds()
   end
   luAnimator.update(args)
 end
